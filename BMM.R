@@ -18,7 +18,7 @@ BMM <- function(x, k, n.iter = 1e3) {
         prior <- table(y) / length(y)
         for (p in 1:nrow(params)) probs[, p] <- dbeta(x, params$a[p], params$b[p]) * prior[p]
         probs <- apply(probs, 2, '/', rowSums(probs))
-        y <- max.col(y)
+        y <- max.col(probs)
     }
     list(y = y, params = params, prior = prior)
 }
