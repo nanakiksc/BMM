@@ -1,6 +1,7 @@
+# TODO: use log probabilities.
 BMM <- function(x, k, n.iter = 1e3) {
+    x <- (x - min(x) + .Machine$double.eps) / (max(x) - min(x) + 2 * .Machine$double.eps) # Scale to the Beta domain.
     x <- sort(x)
-    x <- (x - min(x) + .Machine$double.eps) / (max(x) - min(x) + 2 * .Machine$double.eps)
     y <- rep(1:k, each = length(x) / k)
     y <- c(y, rep(k, length(x) - length(y)))
     params <- data.frame(a = rep(0, k), b = rep(0, k))
@@ -15,7 +16,7 @@ BMM <- function(x, k, n.iter = 1e3) {
         params$b <- (1 - means) * com
 
         # M step.
-        prior <- table(y) / length(y)
+        prior <- (table(y) + 1) / (length(y) + k) # Laplace estimate.
         for (p in 1:nrow(params)) probs[, p] <- dbeta(x, params$a[p], params$b[p]) * prior[p]
         probs <- apply(probs, 2, '/', rowSums(probs))
         y <- max.col(probs)
